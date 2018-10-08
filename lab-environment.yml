@@ -1,0 +1,148 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'learn-iam-policy: lab environment'
+Parameters:
+  VPC:
+    Description: 'Choose the VPC for the lab environment.'
+    Type: 'AWS::EC2::VPC::Id'
+  Subnet:
+    Description: 'Choose a Subnet for the lab environment.'
+    Type: 'AWS::EC2::Subnet::Id'
+  KeyPair:
+    Description: 'Your key pair used to authenticate with the SSH bastion host.'
+    Type: 'AWS::EC2::KeyPair::KeyName'
+  AssociatePublicIpAddress:
+    Description: 'Associate a public IP address to SSH bastion host?'
+    Type: String
+    Default: 'true'
+    AllowedValues:
+    - 'true'
+    - 'false'
+  AllowSSHCidr:
+    Description: 'CIDR from which SSH bastion host accepts connections.'
+    Type: String
+    Default: '0.0.0.0/0'
+Mappings:
+  RegionMap:
+    'ap-south-1':
+      AMI: 'ami-0b173ae0d9e71699a'
+    'eu-west-3':
+      AMI: 'ami-07e5d89c9e173f360'
+    'eu-west-2':
+      AMI: 'ami-0135b45434a538069'
+    'eu-west-1':
+      AMI: 'ami-0eafb5ee12a2cbffc'
+    'ap-northeast-2':
+      AMI: 'ami-02e495c61af26da99'
+    'ap-northeast-1':
+      AMI: 'ami-06962fe7164c1fe7b'
+    'sa-east-1':
+      AMI: 'ami-0e4c9b46b89ddd90c'
+    'ca-central-1':
+      AMI: 'ami-0c612fea430136cb0'
+    'ap-southeast-1':
+      AMI: 'ami-0f67499750e64577a'
+    'ap-southeast-2':
+      AMI: 'ami-0e2b2114bf2fac7d8'
+    'eu-central-1':
+      AMI: 'ami-0e82b8b6afa30f2cd'
+    'us-east-1':
+      AMI: 'ami-0e6d2e8684d4ccb3e'
+    'us-east-2':
+      AMI: 'ami-0785b10e84f9dbd4f'
+    'us-west-1':
+      AMI: 'ami-01eb1709d6ad69035'
+    'us-west-2':
+      AMI: 'ami-0fcd5791ba781e98f'
+Conditions:
+  AssociatePublicIpAddressCondition: !Equals [!Ref AssociatePublicIpAddress, 'true']
+Resources:
+  Ec2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
+      InstanceType: 't3.micro'
+      CreditSpecification:
+        CPUCredits: 'standard'
+      IamInstanceProfile: !Ref IamInstanceProfile
+      KeyName: !Ref KeyPair
+      NetworkInterfaces:
+      - AssociatePublicIpAddress: !Ref AssociatePublicIpAddress
+        DeviceIndex: '0'
+        GroupSet: 
+        - !Ref SecurityGroup
+        SubnetId: !Ref Subnet
+      Tags:
+      - Key: Name
+        Value: !Ref 'AWS::StackName'
+  IamInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Path: '/'
+      Roles:
+      - !Ref IamRole
+  IamRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - 'ec2.amazonaws.com'
+          Action:
+          - 'sts:AssumeRole'
+  SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupName: !Ref 'AWS::StackName' 
+      GroupDescription: 'Allows incoming SSH connections.'
+      VpcId:
+        Ref: VPC
+      SecurityGroupIngress:
+      - CidrIp: !Ref AllowSSHCidr
+        IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+      Tags:
+      - Key: Name
+        Value: !Ref 'AWS::StackName'
+  S3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Ref 'AWS::StackName'
+  SsmParameterPathAValue1:
+    Type: "AWS::SSM::Parameter"
+    Properties: 
+      Name: !Sub '/${AWS::StackName}/a/1'
+      Value: 'a1'
+      Type: 'String'
+  SsmParameterPathAValue2:
+    Type: "AWS::SSM::Parameter"
+    Properties: 
+      Name: !Sub '/${AWS::StackName}/a/2'
+      Value: 'a2'
+      Type: 'String'
+  SsmParameterPathBValue1:
+    Type: "AWS::SSM::Parameter"
+    Properties: 
+      Name: !Sub '/${AWS::StackName}/b/1'
+      Value: 'b1'
+      Type: 'String'
+Outputs:
+  PublicIp:
+    Description: 'The public IP of the SSH bastion host.'
+    Value: !If [AssociatePublicIpAddressCondition, !GetAtt Ec2Instance.PublicIp, '']
+  PrivateIp:
+    Description: 'The private IP of the SSH bastion host.'
+    Value: !GetAtt Ec2Instance.PrivateIp
+  InstanceId:
+    Description: 'The instance ID of the SSH bastion host.'
+    Value: !Ref Ec2Instance
+  IamRole:
+    Description: 'The name of the IAM role attached to the SSH bastion host.'
+    Value: !Ref IamRole
+  S3Bucket:
+    Description: 'The name of the S3 bucket.'
+    Value: !Ref S3Bucket
