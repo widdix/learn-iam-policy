@@ -1,4 +1,4 @@
-# Lab 06: Grant access to KMS customer managed CMK
+# Lab 04: Grant access to KMS customer managed CMK
 
 ## Introduction
 

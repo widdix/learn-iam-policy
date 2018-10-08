@@ -1,4 +1,4 @@
-# Lab 06: Terminate EC2 instance with tag
+# Lab 05: Terminate EC2 instance with tag
 
 ## Introduction
 
