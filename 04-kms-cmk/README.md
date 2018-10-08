@@ -15,6 +15,7 @@ aws kms decrypt --ciphertext-blob fileb://encrypted.txt --region <Region> --outp
 ## Instructions
 
 1. Open [IAM](https://console.aws.amazon.com/iam/home) and go to *Encryption keys*.
+1. Ensure that the correct region is selected
 1. Create a customer managed CMK:
   1. Choose a unique alias.
   1. Keep the defaults for all the following steps.

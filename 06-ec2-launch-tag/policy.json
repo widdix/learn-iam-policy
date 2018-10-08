@@ -24,9 +24,7 @@
     },
     {
       "Effect": "Allow",
-      "Action": [
-        "ec2:CreateTags"
-      ],
+      "Action": "ec2:CreateTags",
       "Resource": "*",
       "Condition": {
         "StringEquals": {

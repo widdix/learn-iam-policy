@@ -2,7 +2,7 @@
 
 ## Introduction
 
-You want to make sure that engineers are not allowed to terminate EC2 instances running production workloads. Therefore, an engineer should only be allowed to terminate instances that are tagged with `environment= test`.
+You want to make sure that engineers are not allowed to terminate EC2 instances running production workloads. Therefore, an engineer should only be allowed to terminate instances that are tagged with `environment = test`.
 
 Write an IAM policy that only allows to terminate instances with a specific tag key and tag value.
 
@@ -19,7 +19,7 @@ aws ec2 terminate-instances --region <Region> --instance-ids <InstanceId>
 1. Add an inline policy to your IAM role.
 1. Make sure you are logged into the SSH bastion host.
 
-Try to terminate the your newly launched instance.
+Try to terminate your newly launched instance.
 
 ```
 aws ec2 terminate-instances --region <Region> --instance-ids <InstanceId>

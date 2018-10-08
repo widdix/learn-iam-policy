@@ -33,7 +33,7 @@ aws ssm get-parameters-by-path --region <Region> --path /<CloudFormationStackNam
 
 **Warning: It might take several minutes until changes to an IAM policy becomes effective.**
 
-* [Actions, Resources, and Condition Keys for Amazon Simple Systems Manager](hhttps://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsimplesystemsmanager.html#amazonsimplesystemsmanager-parameter)
+* [Actions, Resources, and Condition Keys for Amazon Simple Systems Manager](https://docs.aws.amazon.com/IAM/latest/UserGuide/list_amazonsimplesystemsmanager.html#amazonsimplesystemsmanager-parameter)
 * `policy.json` includes a sample solution for the necessary IAM policy.
 
 ## Clean up
