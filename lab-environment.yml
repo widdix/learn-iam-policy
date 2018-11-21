@@ -2,83 +2,55 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'learn-iam-policy: lab environment'
 Parameters:
-  VPC:
-    Description: 'Choose the VPC for the lab environment.'
-    Type: 'AWS::EC2::VPC::Id'
   Subnet:
     Description: 'Choose a Subnet for the lab environment.'
     Type: 'AWS::EC2::Subnet::Id'
-  KeyPair:
-    Description: 'Your key pair used to authenticate with the SSH bastion host.'
-    Type: 'AWS::EC2::KeyPair::KeyName'
-  AssociatePublicIpAddress:
-    Description: 'Associate a public IP address to SSH bastion host?'
-    Type: String
-    Default: 'true'
-    AllowedValues:
-    - 'true'
-    - 'false'
-  AllowSSHCidr:
-    Description: 'CIDR from which SSH bastion host accepts connections.'
-    Type: String
-    Default: '0.0.0.0/0'
 Mappings:
   RegionMap:
     'ap-south-1':
-      AMI: 'ami-0b173ae0d9e71699a'
+      AMI: 'ami-06bcd1131b2f55803'
     'eu-west-3':
-      AMI: 'ami-07e5d89c9e173f360'
+      AMI: 'ami-051707cdba246187b'
     'eu-west-2':
-      AMI: 'ami-0135b45434a538069'
+      AMI: 'ami-0274e11dced17bb5b'
     'eu-west-1':
-      AMI: 'ami-0eafb5ee12a2cbffc'
+      AMI: 'ami-09693313102a30b2c'
     'ap-northeast-2':
-      AMI: 'ami-02e495c61af26da99'
+      AMI: 'ami-0b4fdb56a00adb616'
     'ap-northeast-1':
-      AMI: 'ami-06962fe7164c1fe7b'
+      AMI: 'ami-0a2de1c3b415889d2'
     'sa-east-1':
-      AMI: 'ami-0e4c9b46b89ddd90c'
+      AMI: 'ami-0112d42866980b373'
     'ca-central-1':
-      AMI: 'ami-0c612fea430136cb0'
+      AMI: 'ami-076b4adb3f90cd384'
     'ap-southeast-1':
-      AMI: 'ami-0f67499750e64577a'
+      AMI: 'ami-0b84d2c53ad5250c2'
     'ap-southeast-2':
-      AMI: 'ami-0e2b2114bf2fac7d8'
+      AMI: 'ami-08589eca6dcc9b39c'
     'eu-central-1':
-      AMI: 'ami-0e82b8b6afa30f2cd'
+      AMI: 'ami-034fffcc6a0063961'
     'us-east-1':
-      AMI: 'ami-0e6d2e8684d4ccb3e'
+      AMI: 'ami-009d6802948d06e52'
     'us-east-2':
-      AMI: 'ami-0785b10e84f9dbd4f'
+      AMI: 'ami-02e680c4540db351e'
     'us-west-1':
-      AMI: 'ami-01eb1709d6ad69035'
+      AMI: 'ami-011b6930a81cd6aaf'
     'us-west-2':
-      AMI: 'ami-0fcd5791ba781e98f'
-Conditions:
-  AssociatePublicIpAddressCondition: !Equals [!Ref AssociatePublicIpAddress, 'true']
+      AMI: 'ami-01bbe152bf19d0289'
 Resources:
   Ec2Instance:
     Type: 'AWS::EC2::Instance'
     Properties:
       ImageId: !FindInMap [RegionMap, !Ref 'AWS::Region', AMI]
-      InstanceType: 't3.micro'
-      CreditSpecification:
-        CPUCredits: 'standard'
+      InstanceType: 't2.micro'
       IamInstanceProfile: !Ref IamInstanceProfile
-      KeyName: !Ref KeyPair
-      NetworkInterfaces:
-      - AssociatePublicIpAddress: !Ref AssociatePublicIpAddress
-        DeviceIndex: '0'
-        GroupSet: 
-        - !Ref SecurityGroup
-        SubnetId: !Ref Subnet
+      SubnetId: !Ref Subnet
       Tags:
       - Key: Name
         Value: !Ref 'AWS::StackName'
   IamInstanceProfile:
     Type: 'AWS::IAM::InstanceProfile'
     Properties:
-      Path: '/'
       Roles:
       - !Ref IamRole
   IamRole:
@@ -89,59 +61,73 @@ Resources:
         Statement:
         - Effect: Allow
           Principal:
-            Service:
-            - 'ec2.amazonaws.com'
-          Action:
-          - 'sts:AssumeRole'
-  SecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
-    Properties:
-      GroupName: !Ref 'AWS::StackName' 
-      GroupDescription: 'Allows incoming SSH connections.'
-      VpcId:
-        Ref: VPC
-      SecurityGroupIngress:
-      - CidrIp: !Ref AllowSSHCidr
-        IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-      Tags:
-      - Key: Name
-        Value: !Ref 'AWS::StackName'
+            Service: 'ec2.amazonaws.com'
+          Action: 'sts:AssumeRole'
+      Policies:
+      - PolicyName: 'DO-NOT-CHANGE-LAB-SSM-CONNECTION'
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - 'ssm:DescribeAssociation'
+            - 'ssm:GetDeployablePatchSnapshotForInstance'
+            - 'ssm:GetDocument'
+            - 'ssm:GetManifest'
+            - 'ssm:GetParameters'
+            - 'ssm:ListAssociations'
+            - 'ssm:ListInstanceAssociations'
+            - 'ssm:PutInventory'
+            - 'ssm:PutComplianceItems'
+            - 'ssm:PutConfigurePackageResult'
+            - 'ssm:UpdateAssociationStatus'
+            - 'ssm:UpdateInstanceAssociationStatus'
+            - 'ssm:UpdateInstanceInformation'
+            Resource: '*'
+          - Effect: Allow
+            Action:
+            - 'ssmmessages:CreateControlChannel'
+            - 'ssmmessages:CreateDataChannel'
+            - 'ssmmessages:OpenControlChannel'
+            - 'ssmmessages:OpenDataChannel'
+            Resource: '*'
+          - Effect: Allow
+            Action:
+            - 'ec2messages:AcknowledgeMessage'
+            - 'ec2messages:DeleteMessage'
+            - 'ec2messages:FailMessage'
+            - 'ec2messages:GetEndpoint'
+            - 'ec2messages:GetMessages'
+            - 'ec2messages:SendReply'
+            Resource: '*'
   S3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: !Ref 'AWS::StackName'
+      BucketName: !Sub 'learn-iam-policy-${AWS::StackName}'
   SsmParameterPathAValue1:
-    Type: "AWS::SSM::Parameter"
+    Type: 'AWS::SSM::Parameter'
     Properties: 
       Name: !Sub '/${AWS::StackName}/a/1'
       Value: 'a1'
       Type: 'String'
   SsmParameterPathAValue2:
-    Type: "AWS::SSM::Parameter"
+    Type: 'AWS::SSM::Parameter'
     Properties: 
       Name: !Sub '/${AWS::StackName}/a/2'
       Value: 'a2'
       Type: 'String'
   SsmParameterPathBValue1:
-    Type: "AWS::SSM::Parameter"
+    Type: 'AWS::SSM::Parameter'
     Properties: 
       Name: !Sub '/${AWS::StackName}/b/1'
       Value: 'b1'
       Type: 'String'
 Outputs:
-  PublicIp:
-    Description: 'The public IP of the SSH bastion host.'
-    Value: !If [AssociatePublicIpAddressCondition, !GetAtt Ec2Instance.PublicIp, '']
-  PrivateIp:
-    Description: 'The private IP of the SSH bastion host.'
-    Value: !GetAtt Ec2Instance.PrivateIp
   InstanceId:
-    Description: 'The instance ID of the SSH bastion host.'
+    Description: 'The EC2 instance ID.'
     Value: !Ref Ec2Instance
   IamRole:
-    Description: 'The name of the IAM role attached to the SSH bastion host.'
+    Description: 'The name of the IAM role attached to the EC2 instance.'
     Value: !Ref IamRole
   S3Bucket:
     Description: 'The name of the S3 bucket.'
