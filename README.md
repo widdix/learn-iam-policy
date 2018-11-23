@@ -31,7 +31,7 @@ The CloudFormation template `lab-environment.yml` creates a lab environment cons
 * [Lab 03: Parameter Store read access](https://github.com/widdix/learn-iam-policy/tree/master/03-parameterstore-path)
 * [Lab 04: Grant access to KMS customer managed CMK](https://github.com/widdix/learn-iam-policy/tree/master/04-kms-cmk)
 * [Lab 05: Terminate EC2 instance with tag](https://github.com/widdix/learn-iam-policy/tree/master/05-ec2-terminate-tag)
-* [Lab 06: Launch EC2 instance with tag](https://github.com/widdix/learn-iam-policy/tree/master/05-ec2-terminate-tag)
+* [Lab 06: Launch EC2 instance with tag](https://github.com/widdix/learn-iam-policy/tree/master/06-ec2-launch-tag)
 
 ## Clean up
 
