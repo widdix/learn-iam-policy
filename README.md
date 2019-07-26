@@ -2,6 +2,8 @@
 
 Labs helping you to learn how write IAM policies following the least privilege principle.
 
+Are you looking for an instructor-led workshop based on these labs? Say [hello@widdix.net](mailto:hello@widdix.net).
+
 ## Introduction
 
 We are using `<Variable>` to indicate that you should replace parts of the instructions with a variable.
