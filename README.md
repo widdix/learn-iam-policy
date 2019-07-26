@@ -37,3 +37,7 @@ The CloudFormation template `lab-environment.yml` creates a lab environment cons
 
 1. Empty your S3 bucket `<S3Bucket>`.
 1. Delete your CloudFormation stack.
+
+## More Labs
+
+We offer AWS workshops tailored to your needs. See [widdix/learn-*](https://github.com/widdix?q=learn-) for more labs.
