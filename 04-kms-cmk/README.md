@@ -14,14 +14,16 @@ aws kms decrypt --ciphertext-blob fileb://encrypted.txt --region <Region> --outp
 
 ## Instructions
 
-1. Open [IAM](https://console.aws.amazon.com/iam/home) and go to *Encryption keys*.
+1. Open [KMS](https://eu-central-1.console.aws.amazon.com/kms/home) and go to *Customer-managed keys*.
 1. Ensure that the correct region is selected
 1. Create a customer managed CMK:
+  1. Key type `Symmetric` and key usage `Encrypt and decrypt`.
   1. Choose a unique alias.
+  1. Choose your IAM role/user as the key administrator.
   1. Keep the defaults for all the following steps.
   1. Create the key.
 
-The key policy attached to your customer managed CMK enables IAM policies to administer and use the key. To be able to use the key from the SSH bastion host, you need to create an IAM policy which grants access to the encrypt and decrypt actions.
+The key policy attached to your customer managed CMK enables IAM to grant access to administer and use the key. To be able to use the key from the SSH bastion host, you need to create an IAM policy which grants access to the encrypt and decrypt actions.
 
 1. Open [IAM](https://console.aws.amazon.com/iam/home).
 1. Search an IAM role with a name equal to the `IamRole` output of your CloudFormation stack.
